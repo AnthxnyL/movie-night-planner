@@ -4,7 +4,6 @@ Mini front-end React + TypeScript pour planifier ta soirée série :
 recherche via l'API **TVMaze** (gratuite, sans clé), watchlist sauvegardée
 en localStorage, tri configurable, notifications, undo.
 
-# 🎬 Show Night Planner
 ## Team 
 Anthony Lopes - Thomas Sauvage
 
