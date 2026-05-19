@@ -89,15 +89,6 @@ export function App() {
         )}
       </section>
 
-      <Recommendations
-        watchlist={watchlist.shows}
-        strategy={recommendationStrategy}
-        onStrategyChange={setRecommendationStrategy}
-        onAdd={watchlist.add}
-        onRemove={watchlist.remove}
-        has={watchlist.has}
-      />
-
       <section className="app__watchlist">
         <h2>Your watchlist ({watchlist.shows.length})</h2>
         {sortedWatchlist.length === 0 ? (
@@ -116,6 +107,16 @@ export function App() {
           </div>
         )}
       </section>
+
+      <Recommendations
+        watchlist={watchlist.shows}
+        strategy={recommendationStrategy}
+        onStrategyChange={setRecommendationStrategy}
+        onAdd={watchlist.add}
+        onRemove={watchlist.remove}
+        has={watchlist.has}
+      />
+
 
       <Notifications />
     </div>
