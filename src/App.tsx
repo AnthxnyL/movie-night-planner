@@ -7,11 +7,16 @@ import {
 } from "./patterns/strategy/SortStrategy";
 import { notificationCenter } from "./patterns/observer/NotificationCenter";
 import { NotificationFactory } from "./patterns/factory/NotificationFactory";
+import {
+  autoStrategy,
+  type RecommendationStrategy,
+} from "./patterns/strategy/RecommendationStrategy";
 import { useWatchlist } from "./hooks/useWatchlist";
 import { SearchBar } from "./components/SearchBar";
 import { SortSelector } from "./components/SortSelector";
 import { ShowCard } from "./components/ShowCard";
 import { Notifications } from "./components/Notifications";
+import { Recommendations } from "./components/Recommendations";
 
 export function App() {
   const [results, setResults] = useState<Show[]>([]);
@@ -19,6 +24,8 @@ export function App() {
   const [sortStrategy, setSortStrategy] = useState<SortStrategy>(
     SORT_STRATEGIES[0],
   );
+  const [recommendationStrategy, setRecommendationStrategy] =
+    useState<RecommendationStrategy>(autoStrategy);
   const watchlist = useWatchlist();
 
   const sortedResults = useMemo(
@@ -81,6 +88,15 @@ export function App() {
           </div>
         )}
       </section>
+
+      <Recommendations
+        watchlist={watchlist.shows}
+        strategy={recommendationStrategy}
+        onStrategyChange={setRecommendationStrategy}
+        onAdd={watchlist.add}
+        onRemove={watchlist.remove}
+        has={watchlist.has}
+      />
 
       <section className="app__watchlist">
         <h2>Your watchlist ({watchlist.shows.length})</h2>

@@ -209,6 +209,19 @@ section {
   margin-top: 2rem;
 }
 
+.recommendations__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+
+.recommendations__header h2 {
+  margin: 0;
+}
+
 h2 {
   font-size: 1.1rem;
   margin: 0 0 0.75rem;

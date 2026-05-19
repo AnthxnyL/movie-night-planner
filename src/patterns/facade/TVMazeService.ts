@@ -50,6 +50,13 @@ export class TVMazeService {
     const raw: RawShow = await res.json();
     return toShow(raw);
   }
+
+  async getPool(page: number = 0): Promise<Show[]> {
+    const res = await fetch(`${API_BASE}/shows?page=${page}`);
+    if (!res.ok) throw new Error(`TVMaze getPool failed: ${res.status}`);
+    const raw: RawShow[] = await res.json();
+    return raw.map(toShow);
+  }
 }
 
 export const tvMazeService = new TVMazeService();

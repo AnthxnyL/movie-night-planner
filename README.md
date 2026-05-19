@@ -72,17 +72,21 @@ toucher au reste.
 
 ---
 
-### 3. Strategy — `SortStrategy`
-**Problème** : 4 façons de trier la même liste (note, date, durée, nom).
-Faire un gros `switch` dans le composant `Watchlist` mélange UI et logique
-de tri, et complique l'ajout d'un nouveau critère.
+### 3. Strategy — `SortStrategy` + `RecommendationStrategy`
+**Problème** : (a) 4 façons de trier la même liste (note, date, durée,
+nom) ; (b) plusieurs façons de recommander des shows (top-rated,
+correspondance de genres avec la watchlist, mode auto). Un `switch`
+dans le composant mélange UI et logique métier, et complique l'ajout
+d'un nouveau critère.
 
-**Solution** : chaque stratégie est un objet `{ id, label, sort }` exporté.
-Le composant ne sait pas comment trier, il reçoit une `SortStrategy` et
-appelle `.sort()`.
+**Solution** : chaque stratégie est un objet `{ id, label, sort | recommend }`
+exporté. Les composants ne savent pas *comment* trier ou recommander, ils
+reçoivent une stratégie et appellent sa méthode.
 
-**Pourquoi** : ajouter "Trier par langue" = un objet de 5 lignes dans
-`SortStrategy.ts`, zéro modif dans l'UI.
+**Pourquoi** : ajouter "Trier par langue" ou "Recommander aléatoirement" =
+un objet de 5 lignes dans le fichier strategy, zéro modif dans l'UI.
+La recommandation `auto` délègue à `topRated` ou `genreMatch` selon
+l'état de la watchlist — composition naturelle entre stratégies.
 
 ---
 
@@ -128,54 +132,3 @@ empile les commandes exécutées.
 étendu à un redo, un journal d'actions, ou rejoué pour tester.
 
 ---
-
-## Patterns volontairement **non** utilisés
-
-L'énoncé évalue aussi le fait de justifier l'absence d'un pattern.
-
-### Decorator
-Tentation : enrichir un `Show` avec des badges calculés ("Long
-format", "Top rated", "Nouveau"). Pas retenu : un simple helper
-`computeBadges(show): string[]` fait le job. Empiler des classes
-décoratrices pour une dérivation pure d'attributs = sur-ingénierie pour
-ce projet — la complexité ajoutée dépasse le bénéfice.
-
-### Singleton (explicite)
-On exporte `tvMazeService`, `watchlistRepository`, `notificationCenter`
-comme instances uniques. C'est *de facto* un singleton, mais sans la
-cérémonie (classe privée, `getInstance()`). En TypeScript + ES modules,
-un `export const` partagé est l'idiome naturel ; ajouter le boilerplate
-GoF n'apporterait rien.
-
-### Adapter
-Le `TVMazeService` *fait* de l'adaptation (raw API → type `Show`), mais
-on l'appelle Facade parce que son rôle premier est de simplifier
-*plusieurs* opérations sous une API unique. L'Adapter classique aurait
-été pertinent si on devait faire cohabiter deux APIs (TVMaze + OMDB)
-derrière la même interface — pas le cas ici.
-
-### State
-Le state global (résultats, watchlist, tri sélectionné) tient dans 3
-`useState` + un hook. Introduire une machine à états ou un store
-(Zustand, Redux) pour 4 transitions = bruit inutile. React gère.
-
-### Builder
-Aucun objet ne nécessite une construction multi-étapes complexe. Les
-shows viennent déjà formés de la Facade, les notifications passent par
-la Factory. Un Builder ici serait une solution sans problème.
-
----
-
-## Mapping pattern ↔ fichier (pour l'oral)
-
-| Pattern    | Fichier                                              | Lignes clés                  |
-|------------|------------------------------------------------------|------------------------------|
-| Facade     | `src/patterns/facade/TVMazeService.ts`               | classe `TVMazeService`       |
-| Repository | `src/patterns/repository/WatchlistRepository.ts`     | interface + impl localStorage|
-| Strategy   | `src/patterns/strategy/SortStrategy.ts`              | `SORT_STRATEGIES`            |
-| Observer   | `src/patterns/observer/NotificationCenter.ts`        | `subscribe`/`publish`        |
-| Factory    | `src/patterns/factory/NotificationFactory.ts`        | méthodes `added`/`removed`/… |
-| Command    | `src/patterns/command/WatchlistCommand.ts`           | `execute`/`undo`/`CommandHistory` |
-
-6 patterns, 1 minimum dépassé d'un cran — marge confortable pour la
-soutenance si l'un d'eux est contesté.
